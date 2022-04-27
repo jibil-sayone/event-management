@@ -108,7 +108,11 @@
                 </form>
                 <div class="upcoming-events" id="here">
                     <div class="upcoming-events-header">
+                        {% if not events %}
+                        <h4 align="center">No Events To Display</h4>
+                        {% else %}
                         <h4>Upcoming Events</h4>
+                        {% endif %}
                     </div>
 
                     <div class="upcoming-events-list">
@@ -127,12 +131,12 @@
                             </div>
 
                             <header class="entry-header">
-                                {% if user.is_authenticated %}
+                                {% if user.is_authenticated and event.created_by == user %}
                                 <h3 class="entry-title"><a href="{% url 'update_event' event.id%}">{{event.title}}</a></h3>
                                 {% else %}
                                 <h3 class="entry-title"><a href="#">{{event.title}}</a></h3>
                                 {% endif %}
-                                <div class="event-date-time">{{event.start_date}} - {{event.end_date}}</div>
+                                <div class="event-date-time">{{event.start_date.date}} - {{event.end_date.date}}</div>
 
                                 <div class="event-speaker">{{event.description}}</div>
                             </header>
@@ -140,6 +144,7 @@
                         </div>
                         {% endfor %}
                     </div>
+                    {% if events %}
                     <nav aria-label="Page navigation example">
                         <ul class="pagination justify-content-center">
                         {% if events.has_previous %}
@@ -181,6 +186,7 @@
                         {% endif %}
                       </ul>
                     </nav>
+                    {% endif %}
                     <!--end of Pagination-->
 
                 </div>

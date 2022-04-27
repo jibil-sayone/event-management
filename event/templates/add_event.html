@@ -22,7 +22,7 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
 	}
 
 	input::placeholder {
-	  color: #d3d3d3;
+	  color: #A9A9A9;
 	}
 
 	.submit{
@@ -50,7 +50,7 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
 <h3>Add Your Task Here</h3>
 <form method="POST" action="">
   {% csrf_token %}
-  {{form}}
+  {{ form }}
 <input class="btn btn-info " type="submit" value="Save" name="Save" >
 </form>
 
