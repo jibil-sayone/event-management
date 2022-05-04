@@ -22,4 +22,3 @@ class Event(models.Model):
     def clean(self):
         if self.start_date >= self.end_date:
             raise ValidationError("Start date should be less than end date")
-

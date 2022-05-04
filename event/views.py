@@ -1,12 +1,10 @@
 from django.shortcuts import render,redirect
-from django.http import HttpResponse
-from django.db.models import Q
+from django.http import Http404
 from datetime import datetime
-from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .forms import *
 import stripe
-
+from django.contrib import messages
 
 # Create your views here.
 
@@ -22,7 +20,10 @@ def index(request):
     filter_dict = {}
     filter_dict["end_date__date__gte"] = datetime.today().date()
     filter_cat = Event.objects.values("categories").distinct()
-    events = Event.objects.filter(**filter_dict).order_by('start_date')
+    if request.user.is_authenticated:
+        events = Event.objects.filter(**filter_dict).order_by('start_date')
+    else:
+        events = Event.objects.filter(**filter_dict).filter(published="True").order_by('start_date')
     page = request.GET.get('page', 1)
     paginator = Paginator(events, 10)
     try:
@@ -36,10 +37,17 @@ def index(request):
 
 def updateEvent(request, pk):
 
+    task = Event.objects.get(id=pk)
+
     if not request.user.is_authenticated:
-        return redirect('login/')
+
+        return redirect(YOUR_DOMAIN + '/login/')
+
+    elif task.created_by != request.user:
+
+        return render(request, 'not_found.html')
+
     else:
-        task = Event.objects.get(id=pk)
 
         form = EventForm(instance=task)
 
@@ -47,6 +55,7 @@ def updateEvent(request, pk):
             form = EventForm(request.POST, instance=task)
             if form.is_valid():
                 form.save()
+                messages.success(request, "Event Updated Successfully")
                 return redirect('/')
 
         context = {'task':task,'form':form}
@@ -58,7 +67,7 @@ def updateEvent(request, pk):
 def createEvent(request):
 
     if not request.user.is_authenticated:
-        return redirect('login/')
+        return redirect(YOUR_DOMAIN + '/login/')
     else:
         form = EventForm()
         if request.method =='POST':
@@ -67,7 +76,8 @@ def createEvent(request):
                 new_event = form.save()
                 new_event.created_by = request.user
                 new_event.save()
-            return redirect('/')
+                messages.success(request, "New Event Added Successfully")
+                return redirect('/')
 
         context = {'form':form}
 
@@ -76,8 +86,9 @@ def createEvent(request):
 
 
 def PublishEvent(request, pk):
+
     if not request.user.is_authenticated:
-        return redirect('login/')
+        return redirect(YOUR_DOMAIN + '/login/')
     else:
         checkout_session = stripe.checkout.Session.create(
             line_items=[{
@@ -91,41 +102,28 @@ def PublishEvent(request, pk):
                 'quantity': 1,
             }],
         mode='payment',
-        success_url=YOUR_DOMAIN + '',
-        cancel_url=YOUR_DOMAIN + '',
+        success_url=YOUR_DOMAIN + '/pay_success/{0}'.format(pk),
+        cancel_url=YOUR_DOMAIN + '/pay_fail/',
         )
+        return redirect(checkout_session.url, code=303)
+
+
+def fullfill_order(request,pk):
+
+    if not request.user.is_authenticated:
+        return redirect(YOUR_DOMAIN + '/login/')
+    else:
         event = Event.objects.get(id=pk)
         event.paid = True
         event.published = True
         event.save()
-        return redirect(checkout_session.url, code=303)
+        messages.success(request, "Your Event is successfully published")
+        return redirect(YOUR_DOMAIN + '')
 
+def cancel_order(request):
 
-@csrf_exempt
-def my_webhook_view(request):
-    payload = request.body
-    sig_header = request.META['HTTP_STRIPE_SIGNATURE']
-    event = None
-
-    try:
-        event = stripe.Webhook.construct_event(
-          payload, sig_header, endpoint_secret
-        )
-    except ValueError as e:
-        # Invalid payload
-        return HttpResponse(status=400)
-    except stripe.error.SignatureVerificationError as e:
-        # Invalid signature
-        return HttpResponse(status=400)
-
-    if event["type"] == 'checkout.session.completed':
-        session = event["data"]["object"]
-
-        if session.payment_status == 'paid':
-
-            fullfill_order()
-
-    return HttpResponse(status=200)
-
-def fullfill_order():
-    pass
+    if not request.user.is_authenticated:
+        return redirect(YOUR_DOMAIN + '/login/')
+    else:
+        messages.success(request, "Your operation is failed Please Try Again")
+        return redirect(YOUR_DOMAIN + '')

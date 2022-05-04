@@ -105,6 +105,12 @@
                             </div>
                         </div>
                     </div>
+                    {% for msg in messages %}
+                        <div class="alert alert-success" role="alert">
+                          <h4 class="alert-heading">Well done!</h4>
+                          <p>{{msg}}.</p>
+                        </div>
+                    {% endfor %}
                 </form>
                 <div class="upcoming-events" id="here">
                     <div class="upcoming-events-header">
@@ -131,15 +137,23 @@
                             </div>
 
                             <header class="entry-header">
-                                {% if user.is_authenticated and event.created_by == user %}
-                                <h3 class="entry-title"><a href="{% url 'update_event' event.id%}">{{event.title}}</a></h3>
-                                {% else %}
-                                <h3 class="entry-title"><a href="#">{{event.title}}</a></h3>
-                                {% endif %}
+                                <h3 class="entry-title"><a>{{event.title}}</a></h3>
                                 <div class="event-date-time">{{event.start_date.date}} - {{event.end_date.date}}</div>
 
                                 <div class="event-speaker">{{event.description}}</div>
                             </header>
+
+                            {% if user.is_authenticated %}
+
+                            <div class="entry-meta">
+                                {% if user.is_authenticated and event.created_by == user %}
+                                <a class="btn gradient-bg" href="{% url 'update_event' event.id%}"  >Update Event</a>
+                                {% else %}
+                                <a class="btn gradient-bg"  >Not Permitted</a>
+                                {% endif %}
+                            </div>
+
+                            {% endif %}
 
                         </div>
                         {% endfor %}

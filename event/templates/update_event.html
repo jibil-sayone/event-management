@@ -38,6 +38,10 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
 		box-shadow: 6px 2px 30px 0px rgba(0,0,0,0.75);
 	}
 
+.errorlist.nonfield {
+    color: red;
+    font-weight: Bold;
+}
 
  .btn-info{
    background-color:#230e5c;
@@ -47,7 +51,7 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
 </style>
 <div class="center-column">
 
-<h3>Please Make Changes In Your Tasks :</h3>
+<h3>Please Make Changes In Your Event :</h3>
 <form method="POST" action="">
   {% csrf_token %}
   {{form}}
@@ -59,7 +63,7 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
     {% else %}
     <form action="{% url 'pay' task.id%}" method="POST">
         {% csrf_token %}
-      <input class="btn btn-info " type="submit" value="Publish" name="Publish" >
+      <input class="btn btn-info " type="submit" value="Publish" name="Publish" title="Click Here to Pay and Publish Your Event" >
     </form>
     {% endif %}
 </div>

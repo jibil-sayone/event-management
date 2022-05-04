@@ -1,11 +1,11 @@
 from django.urls import path
-from .views import index, updateEvent, createEvent, my_webhook_view, PublishEvent
+from .views import index, updateEvent, createEvent, fullfill_order, PublishEvent, cancel_order
 
 urlpatterns = [
     path('', index, name='index'),
-    path('create_task', createEvent, name="create_event"),
-    path('update_task/<str:pk>/', updateEvent, name="update_event"),
+    path('create_event', createEvent, name="create_event"),
+    path('update_event/<str:pk>/', updateEvent, name="update_event"),
     path('payment/<str:pk>/', PublishEvent, name="pay"),
-    path('webhook_stripe/', my_webhook_view, name="webhook-stripe")
-
+    path('pay_success/<str:pk>/', fullfill_order, name="fullfill"),
+    path('pay_fail/', cancel_order, name="fail"),
 ]

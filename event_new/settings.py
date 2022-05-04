@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-gt&g)7c*ghj0d*@w4nxzwot9*w6sntz5%1cpoml2i0)d+m4!j6
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1','jibil-event-management.herokuapp.com']
+ALLOWED_HOSTS = ['127.0.0.1','jibil-event-management.herokuapp.com','localhost']
 
 
 # Application definition
